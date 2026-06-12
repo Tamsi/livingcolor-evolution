@@ -1,13 +1,6 @@
 import { createHash } from 'node:crypto';
 import type { AuditIssue, KnowledgeItem, SkillAuditContext, SkillScore } from '../domain/types.js';
 
-const FRAMEWORK_TAG_MAP: Record<string, string[]> = {
-  symfony: ['symfony', 'symfony8', 'symfony7'],
-  drupal: ['drupal', 'drupal10', 'drupal11'],
-  'api-platform': ['api-platform', 'apiplatform'],
-  php: ['php', 'php84'],
-};
-
 const DIMENSION_WEIGHTS = {
   prompt_quality: 0.2,
   reasoning_quality: 0.15,
@@ -18,20 +11,16 @@ const DIMENSION_WEIGHTS = {
   maintainability: 0.1,
 } as const;
 
-export function knowledgeId(raw: string, framework: string, category: string): string {
+export function knowledgeId(raw: string, role: string, category: string): string {
   const normalized = raw.toLowerCase().replace(/\s+/g, ' ').trim().slice(0, 120);
-  return createHash('sha256').update(`${framework}:${category}:${normalized}`).digest('hex').slice(0, 16);
+  return createHash('sha256').update(`${role}:${category}:${normalized}`).digest('hex').slice(0, 16);
 }
 
 export function filterKnowledgeForSkill(
   knowledge: KnowledgeItem[],
-  tags: string[],
+  skillName: string,
 ): KnowledgeItem[] {
-  const tagSet = new Set(tags.map((t) => t.toLowerCase()));
-  return knowledge.filter((item) => {
-    const aliases = FRAMEWORK_TAG_MAP[item.framework] ?? [item.framework];
-    return aliases.some((alias) => tagSet.has(alias));
-  });
+  return knowledge.filter((item) => item.role === skillName);
 }
 
 export function detectIssues(
@@ -53,22 +42,6 @@ export function detectIssues(
         recommendation: `Add guidance about: ${item.practice.slice(0, 200)}`,
       });
     }
-  }
-
-  if (skill.tags.includes('symfony8') && promptLower.includes('symfony 7') && !promptLower.includes('migration')) {
-    issues.push({
-      type: 'obsolete',
-      severity: 'medium',
-      message: 'References Symfony 7 without migration context while skill targets Symfony 8',
-    });
-  }
-
-  if (skill.tags.includes('drupal11') && promptLower.includes('drupal 8')) {
-    issues.push({
-      type: 'obsolete',
-      severity: 'high',
-      message: 'References Drupal 8 while skill targets Drupal 10/11',
-    });
   }
 
   return issues;
@@ -95,7 +68,7 @@ export function computeSkillScore(skill: SkillAuditContext, issues: AuditIssue[]
     architecture_guidance: clamp(100 - highCount * 10 - criticalCount * 15),
     evaluation_coverage: clamp(skill.hasTests ? 90 : 40),
     guardrails: clamp(scoreByKeywords(skill.prompt, ['do not', 'anti-pattern', 'severity', 'when not'])),
-    maintainability: clamp(scoreByKeywords(skill.prompt, ['symfony 8', 'drupal 11', 'php 8']) + (skill.hasExamples ? 10 : 0)),
+    maintainability: clamp(scoreByKeywords(skill.prompt, ['context', 'adapt', 'output format']) + (skill.hasExamples ? 10 : 0)),
   };
 
   const overall = Math.round(

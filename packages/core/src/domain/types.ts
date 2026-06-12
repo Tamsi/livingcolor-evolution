@@ -6,17 +6,19 @@ export type KnowledgeCategory =
   | 'api'
   | 'testing';
 
-export type KnowledgeFramework =
-  | 'symfony'
-  | 'api-platform'
-  | 'doctrine'
-  | 'drupal'
-  | 'php'
-  | 'general';
+export type SourceType = 'rss' | 'changelog_url' | 'github_releases';
+
+export interface RoleSource {
+  type: SourceType;
+  url?: string;
+  repo?: string;
+  confidence?: number;
+}
 
 export type ImportanceLevel = 'critical' | 'high' | 'medium' | 'low';
 
 export interface SourceFinding {
+  role: string;
   source: string;
   title: string;
   finding: string;
@@ -27,7 +29,7 @@ export interface SourceFinding {
 
 export interface RawKnowledge {
   category: KnowledgeCategory;
-  framework: KnowledgeFramework;
+  role: string;
   practice: string;
   importance: ImportanceLevel;
   confidence: number;
@@ -37,7 +39,7 @@ export interface RawKnowledge {
 export interface KnowledgeItem {
   id: string;
   category: KnowledgeCategory;
-  framework: KnowledgeFramework;
+  role: string;
   practice: string;
   importance: ImportanceLevel;
   confidence: number;
@@ -111,22 +113,7 @@ export interface PullRequestResult {
 }
 
 export interface CuratorConfig {
-  frameworks: {
-    symfony: {
-      primary_branch: string;
-      secondary_branches: string[];
-      upgrade_guides: { branch: string; file: string }[];
-    };
-    drupal: {
-      primary_branch: string;
-      secondary_branches: string[];
-      changelog: { api_path: string };
-      change_records: { major_minor: string }[];
-    };
-    'api-platform': { primary_version: string };
-    php: { minimum_version: string };
-  };
-  sources: Record<string, Record<string, string>>;
+  roles: Record<string, RoleSource[]>;
   tiers: {
     tier1: { auto_apply: boolean };
     tier2: { auto_apply: boolean; requires_review: boolean };

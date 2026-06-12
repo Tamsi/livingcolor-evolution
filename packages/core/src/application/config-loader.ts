@@ -4,23 +4,26 @@ import { z } from 'zod';
 import type { CuratorConfig } from '../domain/types.js';
 import type { ConfigLoaderPort } from '../ports/index.js';
 
-const CuratorConfigSchema = z.object({
-  frameworks: z.object({
-    symfony: z.object({
-      primary_branch: z.string(),
-      secondary_branches: z.array(z.string()),
-      upgrade_guides: z.array(z.object({ branch: z.string(), file: z.string() })),
-    }),
-    drupal: z.object({
-      primary_branch: z.string(),
-      secondary_branches: z.array(z.string()),
-      changelog: z.object({ api_path: z.string() }),
-      change_records: z.array(z.object({ major_minor: z.string() })),
-    }),
-    'api-platform': z.object({ primary_version: z.string() }),
-    php: z.object({ minimum_version: z.string() }),
+const RoleSourceSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('rss'),
+    url: z.string().url(),
+    confidence: z.number().min(0).max(1).optional(),
   }),
-  sources: z.record(z.record(z.string())),
+  z.object({
+    type: z.literal('changelog_url'),
+    url: z.string().url(),
+    confidence: z.number().min(0).max(1).optional(),
+  }),
+  z.object({
+    type: z.literal('github_releases'),
+    repo: z.string().regex(/^[\w.-]+\/[\w.-]+$/, 'expected "owner/repo"'),
+    confidence: z.number().min(0).max(1).optional(),
+  }),
+]);
+
+const CuratorConfigSchema = z.object({
+  roles: z.record(z.array(RoleSourceSchema)),
   tiers: z.object({
     tier1: z.object({ auto_apply: z.boolean() }),
     tier2: z.object({ auto_apply: z.boolean(), requires_review: z.boolean() }),

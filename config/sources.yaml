@@ -1,42 +1,22 @@
-frameworks:
-  symfony:
-    primary_branch: "8.2"
-    secondary_branches:
-      - "7.4"
-    upgrade_guides:
-      - branch: "8.2"
-        file: "UPGRADE-8.2.md"
-      - branch: "8.0"
-        file: "UPGRADE-8.0.md"
-  drupal:
-    primary_branch: "11.4.x"
-    secondary_branches:
-      - "10.6.x"
-    changelog:
-      api_path: "drupal/core%21CHANGELOG.txt/{branch}"
-    change_records:
-      - major_minor: "11.4"
-      - major_minor: "10.6"
-  api-platform:
-    primary_version: "4"
-  php:
-    minimum_version: "8.4"
-
-sources:
-  symfony:
-    blog_rss: "https://symfony.com/blog/rss.xml"
-    github_repo: "symfony/symfony"
-    docs: "https://symfony.com/doc/current/"
-  drupal:
-    releases_rss: "https://www.drupal.org/project/drupal/releases?format=feed"
-    github_repo: "drupal/drupal"
-    docs: "https://www.drupal.org/docs"
-    changelog_api: "https://api.drupal.org/api/drupal/core%21CHANGELOG.txt"
-  api-platform:
-    github_repo: "api-platform/core"
-    docs: "https://api-platform.com/docs/"
-  php:
-    rfc_index: "https://wiki.php.net/rfc"
+roles:
+  security-auditor:
+    - type: rss
+      url: "https://owasp.org/feed.xml"
+      confidence: 0.9
+    - type: github_releases
+      repo: "OWASP/Top10"
+  ticket-analyst:
+    - type: rss
+      url: "https://www.scrum.org/resources/blog/rss.xml"
+      confidence: 0.8
+  code-architect:
+    - type: rss
+      url: "https://martinfowler.com/feed.atom"
+      confidence: 0.85
+  qa-reviewer:
+    - type: rss
+      url: "https://www.ministryoftesting.com/feeds/blogs"
+      confidence: 0.8
 
 tiers:
   tier1:
