@@ -10,7 +10,7 @@ import type { SkillAuditorPort } from '@curator/core';
 export class SkillAuditor implements SkillAuditorPort {
   auditAll(skills: SkillAuditContext[], knowledge: KnowledgeItem[]): AuditReport[] {
     return skills.map((skill) => {
-      const relevant = filterKnowledgeForSkill(knowledge, skill.tags);
+      const relevant = filterKnowledgeForSkill(knowledge, skill.name);
       const issues = detectIssues(skill, relevant);
       const score = computeSkillScore(skill, issues);
       return {

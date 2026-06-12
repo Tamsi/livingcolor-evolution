@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { createCoreServices } from '@curator/core';
 import type { CuratorRunReport, PullRequestResult } from '@curator/core';
-import { TrendScout } from '@curator/research';
+import { ConfigDrivenFetcher } from '@curator/research';
 import { KnowledgeNormalizer, createKnowledgeExtractor } from '@curator/extraction';
 import { HermesSkillRegistry, SkillAuditor } from '@curator/auditing';
 import { AdditivePatchGenerator } from '@curator/refactoring';
@@ -38,7 +38,7 @@ export class CuratorPipeline {
     const { http, cache, configLoader, reportWriter } = createCoreServices(options.cacheDir);
     const config = await configLoader.loadConfig(options.configPath);
 
-    const scout = new TrendScout(http, cache);
+    const scout = new ConfigDrivenFetcher(http, cache);
     const findings = await scout.fetchAll(config);
 
     const extractor = createKnowledgeExtractor();
