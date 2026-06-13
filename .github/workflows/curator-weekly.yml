@@ -84,6 +84,14 @@ jobs:
           node-version: '20'
           cache: pnpm
 
+      - name: Install livingcolor-skills dependencies
+        working-directory: livingcolor-skills
+        run: pnpm install --frozen-lockfile
+
+      - name: Build livingcolor-skills
+        working-directory: livingcolor-skills
+        run: pnpm build
+
       - name: Link livingcolor-skills for curator overrides
         run: ln -sfn "${{ github.workspace }}/livingcolor-skills" "${{ github.workspace }}/../livingcolor-skills"
 
