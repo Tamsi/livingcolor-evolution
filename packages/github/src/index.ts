@@ -3,6 +3,8 @@ import { join } from 'node:path';
 import type { CuratorRunReport, GitPatch, PullRequestResult } from '@curator/core';
 import type { PullRequestPort } from '@curator/core';
 
+export { GitHubPluginLockBumpService } from './plugin-lock-bump.js';
+
 export interface GitHubConfig {
   token?: string;
   owner: string;

@@ -5,6 +5,7 @@ import type {
   EvaluationGate,
   GitPatch,
   KnowledgeItem,
+  PluginLockBumpRequest,
   PullRequestResult,
   RawKnowledge,
   SkillAuditContext,
@@ -58,6 +59,10 @@ export interface PullRequestPort {
     report: CuratorRunReport,
     options: { dryRun: boolean },
   ): Promise<PullRequestResult | null>;
+}
+
+export interface PluginLockBumpPort {
+  create(request: PluginLockBumpRequest): Promise<PullRequestResult | null>;
 }
 
 export interface SkillRegistryPort {

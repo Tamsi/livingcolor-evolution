@@ -2,7 +2,7 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
-import { CuratorPipeline, resolveDefaultPaths } from '@curator/scheduler';
+import { CuratorPipeline, resolveDefaultPaths, runPluginLockBump } from '@curator/scheduler';
 
 const program = new Command();
 
@@ -105,6 +105,34 @@ program
       openPr: true,
       dryRun: options.dryRun ?? !process.env['GITHUB_TOKEN'],
     });
+  });
+
+program
+  .command('plugin-bump')
+  .description('Open a livingcolor-plugin PR that bumps livingcolor.skills.lock.json')
+  .requiredOption('--skills-ref <ref>', 'Validated livingcolor-skills ref')
+  .requiredOption('--resolved-commit <sha>', 'Resolved livingcolor-skills commit SHA')
+  .option('--dry-run', 'Do not call GitHub API')
+  .action(async (options: { skillsRef: string; resolvedCommit: string; dryRun?: boolean }) => {
+    const target = process.env['CURATOR_PLUGIN_TARGET_REPO'] ?? 'Tamsi/livingcolor-plugin';
+    const [owner = 'Tamsi', repo = 'livingcolor-plugin'] = target.split('/');
+    const token = process.env['GITHUB_TOKEN'];
+    const result = await runPluginLockBump({
+      pluginOwner: owner,
+      pluginRepo: repo,
+      baseBranch: process.env['CURATOR_PLUGIN_BASE_BRANCH'] ?? 'main',
+      lockPath: process.env['CURATOR_PLUGIN_LOCK_PATH'] ?? 'livingcolor.skills.lock.json',
+      ...(token ? { token } : {}),
+      request: {
+        skillsRepo: 'Tamsi/livingcolor-skills',
+        skillsRef: options.skillsRef,
+        resolvedCommit: options.resolvedCommit,
+        bundle: 'code-review-pipeline',
+        skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor'],
+        dryRun: options.dryRun ?? !token,
+      },
+    });
+    console.log(result ? `Plugin PR: ${result.url}` : 'Plugin PR dry-run complete.');
   });
 
 const schedule = program.command('schedule').description('Scheduler commands');

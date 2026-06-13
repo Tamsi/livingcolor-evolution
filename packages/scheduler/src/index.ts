@@ -7,7 +7,8 @@ import { KnowledgeNormalizer, createKnowledgeExtractor } from '@curator/extracti
 import { HermesSkillRegistry, SkillAuditor } from '@curator/auditing';
 import { AdditivePatchGenerator } from '@curator/refactoring';
 import { CuratorEvaluationGate } from '@curator/evaluation';
-import { GitHubPullRequestService } from '@curator/github';
+import { GitHubPluginLockBumpService, GitHubPullRequestService } from '@curator/github';
+import type { PluginLockBumpRequest } from '@curator/core';
 
 export interface CuratorPipelineOptions {
   projectRoot: string;
@@ -28,6 +29,24 @@ export interface CuratorPipelineOptions {
 export interface CuratorPipelineResult {
   report: CuratorRunReport;
   pullRequest: PullRequestResult | null;
+}
+
+export async function runPluginLockBump(options: {
+  token?: string;
+  pluginOwner: string;
+  pluginRepo: string;
+  baseBranch: string;
+  lockPath: string;
+  request: PluginLockBumpRequest;
+}): Promise<PullRequestResult | null> {
+  const service = new GitHubPluginLockBumpService({
+    owner: options.pluginOwner,
+    repo: options.pluginRepo,
+    baseBranch: options.baseBranch,
+    lockPath: options.lockPath,
+    ...(options.token ? { token: options.token } : {}),
+  });
+  return service.create(options.request);
 }
 
 export class CuratorPipeline {

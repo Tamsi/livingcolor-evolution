@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: '0 4 * * 0'
   workflow_dispatch:
+    inputs:
+      plugin_skills_ref:
+        description: 'Validated livingcolor-skills ref for the plugin lock bump'
+        required: false
+        type: string
+      plugin_skills_commit:
+        description: 'Resolved livingcolor-skills commit SHA for the plugin lock bump'
+        required: false
+        type: string
 
 jobs:
   curator:
@@ -49,3 +58,31 @@ jobs:
           HERMES_LLM_PROVIDER: anthropic
           CURATOR_MOCK_LLM: ${{ secrets.ANTHROPIC_API_KEY == '' && 'true' || '' }}
         run: pnpm curator pr
+
+  plugin-lock-bump:
+    needs: curator
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.plugin_skills_ref != '' && inputs.plugin_skills_commit != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install curator
+        run: pnpm install --frozen-lockfile
+
+      - name: Build curator
+        run: pnpm build
+
+      - name: Open plugin lock bump PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURATOR_PLUGIN_TARGET_REPO: Tamsi/livingcolor-plugin
+        run: pnpm curator plugin-bump --skills-ref "${{ inputs.plugin_skills_ref }}" --resolved-commit "${{ inputs.plugin_skills_commit }}"

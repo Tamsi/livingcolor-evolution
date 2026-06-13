@@ -112,6 +112,23 @@ export interface PullRequestResult {
   number: number;
 }
 
+export interface PluginLockBumpRequest {
+  skillsRepo: 'Tamsi/livingcolor-skills';
+  skillsRef: string;
+  resolvedCommit: string;
+  bundle: 'code-review-pipeline';
+  skills: string[];
+  dryRun: boolean;
+}
+
+export interface PluginLockBumpConfig {
+  token?: string;
+  owner: string;
+  repo: string;
+  baseBranch: string;
+  lockPath: string;
+}
+
 export interface CuratorConfig {
   roles: Record<string, RoleSource[]>;
   tiers: {
