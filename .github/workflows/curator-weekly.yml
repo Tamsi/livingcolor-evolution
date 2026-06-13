@@ -44,6 +44,9 @@ jobs:
         working-directory: livingcolor-skills
         run: pnpm build
 
+      - name: Link livingcolor-skills for curator overrides
+        run: ln -sfn "${{ github.workspace }}/livingcolor-skills" "${{ github.workspace }}/../livingcolor-skills"
+
       - name: Install curator
         run: pnpm install --frozen-lockfile
 
@@ -66,6 +69,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/checkout@v4
+        with:
+          repository: Tamsi/livingcolor-skills
+          path: livingcolor-skills
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -74,6 +83,9 @@ jobs:
         with:
           node-version: '20'
           cache: pnpm
+
+      - name: Link livingcolor-skills for curator overrides
+        run: ln -sfn "${{ github.workspace }}/livingcolor-skills" "${{ github.workspace }}/../livingcolor-skills"
 
       - name: Install curator
         run: pnpm install --frozen-lockfile
