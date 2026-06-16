@@ -23,7 +23,13 @@ interface GitHubPullRequestResponse {
   number: number;
 }
 
-const EXPECTED_SKILLS = ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor'];
+const EXPECTED_SKILLS = [
+  'ticket-analyst',
+  'code-architect',
+  'qa-reviewer',
+  'security-auditor',
+  'sprint-reporter',
+];
 
 export class GitHubPluginLockBumpService implements PluginLockBumpPort {
   constructor(

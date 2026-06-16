@@ -8,7 +8,7 @@ const request: PluginLockBumpRequest = {
   skillsRef: 'v0.2.0',
   resolvedCommit: '0123456789abcdef0123456789abcdef01234567',
   bundle: 'code-review-pipeline',
-  skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor'],
+  skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor', 'sprint-reporter'],
   dryRun: false,
 };
 
@@ -79,7 +79,7 @@ describe('GitHubPluginLockBumpService', () => {
           ref: 'v0.2.0',
           resolvedCommit: '0123456789abcdef0123456789abcdef01234567',
           bundle: 'code-review-pipeline',
-          skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor'],
+          skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor', 'sprint-reporter'],
           updatedBy: 'livingcolor-evolution',
         },
         null,

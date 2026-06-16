@@ -128,7 +128,7 @@ program
         skillsRef: options.skillsRef,
         resolvedCommit: options.resolvedCommit,
         bundle: 'code-review-pipeline',
-        skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor'],
+        skills: ['ticket-analyst', 'code-architect', 'qa-reviewer', 'security-auditor', 'sprint-reporter'],
         dryRun: options.dryRun ?? !token,
       },
     });
